@@ -1,2 +1,0 @@
-# combinator
-Created with CodeSandbox
