@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
+
 import styled from 'styled-components';
+import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 
 const Container = styled.div`
   display: flex;
@@ -8,7 +16,9 @@ const Container = styled.div`
   margin-top: 30px;
 `;
 
-const CombineBtn = styled.button`
+const CombineBtn = styled(Button).attrs({
+  variant: 'outlined'
+})`
   flex: 1;
   height: 40px;
   align-self: center;
@@ -19,40 +29,19 @@ const CombinationsContainer = styled.div`
   flex: 1;
 
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 100px;
+  grid-template-columns: repeat(auto-fit, 200px);
+  grid-auto-rows: 200px;
+  grid-gap: 10px;
+  margin-top: 10px;
 `;
 
-const CombinationBox = styled.div`
-  flex: 1;
-  max-width: 200px;
-  max-height: 400px;
+const CombinationBox = styled(Card)`
+  width: 200px;
+  height: 200px;
 
   display: flex;
   flex-direction: column;
-
-  border: 1px solid;
-  margin: 10px;
 `;
-
-const CombinationProperty = styled.div`
-  flex: 1;
-
-  display: flex;
-  align-items: center;
-`;
-
-const CombinationPropertyName = styled.div`
-  padding-right: 10px;
-  margin: 10px;
-  color: blue;
-
-  &:after {
-    content: ':';
-  }
-`;
-
-const CombinationPropertyValue = styled.div``;
 
 const Combinations = ({ properties, isValid }) => {
   const [combinations, setCombinations] = useState([]);
@@ -67,11 +56,15 @@ const Combinations = ({ properties, isValid }) => {
 
     for (let i = 0; i < count; i++) {
       generated.push(
-        properties.map((property, index) => ({
-          name: property.name,
-          // this is a fucking magic, I still don't get shifting :(
-          value: property.values[(i >> index) % property.values.length]
-        }))
+        //TODO: Handle reverse gracefully
+        Array.from(properties)
+          .reverse()
+          .map((property, index) => ({
+            name: property.name,
+            // this is a fucking magic, I still don't get shifting :(
+            value: property.values[(i >> index) % property.values.length]
+          }))
+          .reverse()
       );
     }
 
@@ -86,16 +79,22 @@ const Combinations = ({ properties, isValid }) => {
       <CombinationsContainer>
         {combinations.map((comb, i) => (
           <CombinationBox key={i}>
-            {comb.map(combProperty => (
-              <CombinationProperty key={combProperty.name}>
-                <CombinationPropertyName>
-                  {combProperty.name}
-                </CombinationPropertyName>
-                <CombinationPropertyValue>
-                  {combProperty.value}
-                </CombinationPropertyValue>
-              </CombinationProperty>
-            ))}
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Property</TableCell>
+                  <TableCell align="right">Value</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {comb.map(combProperty => (
+                  <TableRow key={combProperty.name}>
+                    <TableCell>{combProperty.name}</TableCell>
+                    <TableCell align="right">{combProperty.value}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </CombinationBox>
         ))}
       </CombinationsContainer>
