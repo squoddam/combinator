@@ -13,33 +13,38 @@ import {
   CombinationBox
 } from './styled';
 
+const generate = (properties) => {
+  const [currentProp, ...others] = properties;
+  let children = null;
+  if (others.length > 0) {
+    children = generate(others);
+  }
+
+  const { name, values } = currentProp;
+
+  return values.map(value => {
+    if (children) {
+      return children.map(child => [
+        {
+          name,
+          value
+        },
+        ...child,
+      ]);
+    }
+
+    return [[{
+      name,
+      value
+    }]];
+  }).reduce((res, arr) => [...res, ...arr], []);
+}
+
 const Combinations = ({ properties, isValid }) => {
   const [combinations, setCombinations] = useState([]);
 
-  const generateCombinations = () => {
-    const count = properties.reduce(
-      (acc, property) => acc * property.values.length,
-      1
-    );
-
-    const generated = [];
-
-    for (let i = 0; i < count; i++) {
-      generated.push(
-        //TODO: Handle reverse gracefully
-        Array.from(properties)
-          .reverse()
-          .map((property, index) => ({
-            name: property.name,
-            // this is a fucking magic, I still don't get shifting :(
-            value: property.values[(i >> index) % property.values.length]
-          }))
-          .reverse()
-      );
-    }
-
-    setCombinations(generated);
-  };
+  const generateCombinations = () =>
+    setCombinations(generate(properties));
 
   return (
     <Container>

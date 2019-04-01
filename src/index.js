@@ -9,19 +9,12 @@ import Combinations from './components/Combinations';
 function App() {
   const [properties, setProperties] = useDraft([
     // {
-    //   id: 0,
-    //   name: 0,
-    //   values: ['0,2,4,6', '1,3,5,7']
+    //   name: 'a',
+    //   values: ['1', '2']
     // },
     // {
-    //   id: 1,
-    //   name: 1,
-    //   values: ['0,1,4,5', '2,3,6,7']
-    // },
-    // {
-    //   id: 1,
-    //   name: 3,
-    //   values: ['0,1,2,3', '4,5,6,7']
+    //   name: 'b',
+    //   values: ['1', '2']
     // }
   ]);
 
