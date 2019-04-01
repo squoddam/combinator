@@ -23,19 +23,25 @@ const Config = ({
   const [notValid, setNotValid] = useState([]);
 
   useEffect(() => {
-    const namesOnly = properties.map(({ name }) => name);
-    const notValid = properties
-      .filter(
-        property =>
-          property.name.length === 0 ||
-          property.values.some(value => value.length === 0) ||
-          namesOnly.filter(name => property.name === name).length > 1
-      )
-      .map(({ id }) => id);
+    if (properties.length === 0) {
+      setIsValid(false);
 
-    setIsValid(notValid.length === 0);
-
-    setNotValid(notValid);
+      setNotValid([]);
+    } else {
+      const namesOnly = properties.map(({ name }) => name);
+      const notValid = properties
+        .filter(
+          property =>
+            property.name.length === 0 ||
+            property.values.some(value => value.length === 0) ||
+            namesOnly.filter(name => property.name === name).length > 1
+        )
+        .map(({ id }) => id);
+  
+      setIsValid(notValid.length === 0);
+  
+      setNotValid(notValid);
+    }
   }, [properties]);
 
   const isPropertyValid = id => !notValid.includes(id);
