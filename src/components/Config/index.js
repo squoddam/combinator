@@ -1,88 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
-import styled from 'styled-components';
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
 import Add from '@material-ui/icons/AddRounded';
 import Remove from '@material-ui/icons/RemoveCircleOutline';
-import TextField from '@material-ui/core/TextField';
-
-const StyledInput = styled(TextField)`
-  && {
-    min-width: 100%;
-  }
-`;
-
-const DeleteBtn = styled.div`
-  cursor: pointer;
-  padding: 0 5px;
-`;
-
-const PropertiesContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  font-family: Arial;
-`;
-
-const Property = styled(Card)`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  margin: 5px;
-  padding: 10px;
-  height: 200px;
-  flex: 0 0 200px;
-`;
-
-const PropertyNameInput = styled(StyledInput)`
-  min-width: 100%;
-`;
-
-const PropertyValuesContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 10px 0 10px 50px;
-  overflow: auto;
-`;
-
-const PropertyValueContainer = styled.div`
-  position: relative;
-  display: flex;
-  align-items: baseline;
-`;
-
-const Controls = styled.div`
-  position: absolute;
-  height: 100%;
-  top: 0;
-  left: -40px;
-  display: flex;
-  align-items: flex-end;
-`;
-
-const PropertyValueInput = styled(StyledInput)`
-  max-width: 100px;
-  margin: 10px 0;
-`;
-
-const AddPropertyBtn = styled(Property)`
-  && {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
-`;
-
-const AddPropertyValueBtn = styled(Button).attrs({
-  variant: 'outlined',
-  size: 'small'
-})`
-  && {
-    margin-top: 20px;
-    font-size: 0.6em;
-  }
-`;
+import {
+  PropertiesContainer,
+  Property,
+  Controls,
+  DeleteBtn,
+  PropertyNameInput,
+  PropertyValueContainer,
+  AddPropertyValueBtn,
+  AddPropertyBtn,
+  PropertyValuesContainer,
+  PropertyValueInput
+} from './styled';
 
 const Config = ({
   propertiesState: { properties, setProperties },
@@ -91,19 +23,25 @@ const Config = ({
   const [notValid, setNotValid] = useState([]);
 
   useEffect(() => {
-    const namesOnly = properties.map(({ name }) => name);
-    const notValid = properties
-      .filter(
-        property =>
-          property.name.length === 0 ||
-          property.values.some(value => value.length === 0) ||
-          namesOnly.filter(name => property.name === name).length > 1
-      )
-      .map(({ id }) => id);
+    if (properties.length === 0) {
+      setIsValid(false);
 
-    setIsValid(notValid.length === 0);
-
-    setNotValid(notValid);
+      setNotValid([]);
+    } else {
+      const namesOnly = properties.map(({ name }) => name);
+      const notValid = properties
+        .filter(
+          property =>
+            property.name.length === 0 ||
+            property.values.some(value => value.length === 0) ||
+            namesOnly.filter(name => property.name === name).length > 1
+        )
+        .map(({ id }) => id);
+  
+      setIsValid(notValid.length === 0);
+  
+      setNotValid(notValid);
+    }
   }, [properties]);
 
   const isPropertyValid = id => !notValid.includes(id);
@@ -197,6 +135,14 @@ const Config = ({
       </AddPropertyBtn>
     </PropertiesContainer>
   );
+};
+
+Config.propTypes = {
+  propertiesState: PropTypes.shape({
+    properties: PropTypes.array,
+    setProperties: PropTypes.func
+  }),
+  setIsValid: PropTypes.bool
 };
 
 export default Config;

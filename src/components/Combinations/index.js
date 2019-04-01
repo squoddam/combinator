@@ -1,75 +1,50 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
-import styled from 'styled-components';
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import {
+  Container,
+  CombineBtn,
+  CombinationsContainer,
+  CombinationBox
+} from './styled';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  font-family: Arial;
-  margin-top: 30px;
-`;
+const generate = (properties) => {
+  const [currentProp, ...others] = properties;
+  let children = null;
+  if (others.length > 0) {
+    children = generate(others);
+  }
 
-const CombineBtn = styled(Button).attrs({
-  variant: 'outlined'
-})`
-  flex: 1;
-  height: 40px;
-  align-self: center;
-  border-radius: 10px;
-`;
+  const { name, values } = currentProp;
 
-const CombinationsContainer = styled.div`
-  flex: 1;
+  return values.map(value => {
+    if (children) {
+      return children.map(child => [
+        {
+          name,
+          value
+        },
+        ...child,
+      ]);
+    }
 
-  display: grid;
-  grid-template-columns: repeat(auto-fit, 200px);
-  grid-auto-rows: 200px;
-  grid-gap: 10px;
-  margin-top: 10px;
-`;
-
-const CombinationBox = styled(Card)`
-  width: 200px;
-  height: 200px;
-
-  display: flex;
-  flex-direction: column;
-`;
+    return [[{
+      name,
+      value
+    }]];
+  }).reduce((res, arr) => [...res, ...arr], []);
+}
 
 const Combinations = ({ properties, isValid }) => {
   const [combinations, setCombinations] = useState([]);
 
-  const generateCombinations = () => {
-    const count = properties.reduce(
-      (acc, property) => acc * property.values.length,
-      1
-    );
-
-    const generated = [];
-
-    for (let i = 0; i < count; i++) {
-      generated.push(
-        //TODO: Handle reverse gracefully
-        Array.from(properties)
-          .reverse()
-          .map((property, index) => ({
-            name: property.name,
-            // this is a fucking magic, I still don't get shifting :(
-            value: property.values[(i >> index) % property.values.length]
-          }))
-          .reverse()
-      );
-    }
-
-    setCombinations(generated);
-  };
+  const generateCombinations = () =>
+    setCombinations(generate(properties));
 
   return (
     <Container>
@@ -100,6 +75,11 @@ const Combinations = ({ properties, isValid }) => {
       </CombinationsContainer>
     </Container>
   );
+};
+
+Combinations.propTypes = {
+  properties: PropTypes.array,
+  isValid: PropTypes.bool
 };
 
 export default Combinations;
